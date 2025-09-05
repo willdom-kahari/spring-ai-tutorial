@@ -11,6 +11,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.Map;
 
@@ -18,6 +21,7 @@ import java.util.Map;
  * @author <a href="mailto:developer.wadu@gmail.com">Willdom Kahari</a>
  */
 @RestController
+@Validated
 public class SimplePromptController {
     private final ChatClient chatClient;
     @Value("classpath:prompts/youtube.st")
@@ -37,7 +41,10 @@ public class SimplePromptController {
     }
 
     @GetMapping("/yt")
-    public String simplePromptTemplate(@RequestParam(value = "genre", defaultValue = "tech") String genre) {
+    public String simplePromptTemplate(@RequestParam(value = "genre", defaultValue = "tech") 
+                                      @NotBlank(message = "Genre cannot be blank")
+                                      @Size(min = 1, max = 50, message = "Genre must be between 1 and 50 characters")
+                                      String genre) {
         String message = """
                 List 10 of the most popular Youtubers in {genre} along with their current subscriber counts.
                 If you don't know the answer, just say "I don't know".
@@ -53,7 +60,10 @@ public class SimplePromptController {
     }
 
     @GetMapping("/yt-ex")
-    public String simpleExtPromptTemplate(@RequestParam(value = "genre", defaultValue = "tech") String genre) {
+    public String simpleExtPromptTemplate(@RequestParam(value = "genre", defaultValue = "tech") 
+                                         @NotBlank(message = "Genre cannot be blank")
+                                         @Size(min = 1, max = 50, message = "Genre must be between 1 and 50 characters")
+                                         String genre) {
 
         PromptTemplate template = PromptTemplate.builder()
                 .resource(youTubePromptTemplate)

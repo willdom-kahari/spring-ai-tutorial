@@ -8,6 +8,9 @@ import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.ListOutputConverter;
 import org.springframework.ai.converter.MapOutputConverter;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +20,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/output")
+@Validated
 public class OutputController {
     private final ChatClient chatClient;
 
@@ -26,7 +30,10 @@ public class OutputController {
 
     @GetMapping("/songs")
     //list output converter is used to parse the output
-    public List<String> generate(@RequestParam(value = "artist", defaultValue = "Taylor Swift") String artist){
+    public List<String> generate(@RequestParam(value = "artist", defaultValue = "Taylor Swift") 
+                                @NotBlank(message = "Artist name cannot be blank")
+                                @Size(min = 1, max = 100, message = "Artist name must be between 1 and 100 characters")
+                                String artist){
         String message = """
                 Please give me a list of the top 10 songs by {artist}. If you don't know the answer, just say "I don't know".
                 {format}
@@ -49,7 +56,10 @@ public class OutputController {
     }
 
     @GetMapping("/{author}")
-    public Map<String, Object> generateBooks(@PathVariable(value = "author") String author){
+    public Map<String, Object> generateBooks(@PathVariable(value = "author") 
+                                           @NotBlank(message = "Author name cannot be blank")
+                                           @Size(min = 1, max = 100, message = "Author name must be between 1 and 100 characters")
+                                           String author){
         String message = """
                 Generate a list of links for the author {author}. Include the author's name as the key and any social network links as the object.
                 {format}
@@ -73,7 +83,10 @@ public class OutputController {
     }
 
     @GetMapping("/books")
-    public Author generateBooksVyAuthor(@RequestParam(value = "author", defaultValue = "Ken Kousen") String author){
+    public Author generateBooksVyAuthor(@RequestParam(value = "author", defaultValue = "Ken Kousen") 
+                                       @NotBlank(message = "Author name cannot be blank")
+                                       @Size(min = 1, max = 100, message = "Author name must be between 1 and 100 characters")
+                                       String author){
         String message = """
                 Generate a list of books written by the author {author}. If you are not positive that the book belongs to this author, please don't include it.
                 {format}

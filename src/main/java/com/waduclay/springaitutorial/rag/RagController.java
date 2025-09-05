@@ -38,7 +38,10 @@ public class RagController {
 
 
     @GetMapping("/faq")
-    public String generate(@RequestParam(value = "message", defaultValue = "Tell me a Dad joke") String message){
+    public String generate(@RequestParam(value = "message", defaultValue = "Tell me a Dad joke") 
+                          @NotBlank(message = "Message cannot be blank")
+                          @Size(min = 1, max = 500, message = "Message must be between 1 and 500 characters")
+                          String message){
         List<Document> similarDocs = vectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(message)

@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -19,6 +22,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/olympics")
+@Validated
 public class OlympicController {
     private final ChatClient chatClient;
     @Value("classpath:prompts/olympic-sports.st")
@@ -31,7 +35,10 @@ public class OlympicController {
 
     @GetMapping("/2024")
     public String get2024OlympicSports(
-            @RequestParam(value = "message", defaultValue = "What sports are being includen in the 2024 summer olympics?") String message,
+            @RequestParam(value = "message", defaultValue = "What sports are being includen in the 2024 summer olympics?") 
+            @NotBlank(message = "Message cannot be blank")
+            @Size(min = 1, max = 500, message = "Message must be between 1 and 500 characters")
+            String message,
 
             @RequestParam(value = "stuffit", defaultValue = "false") boolean stuffit
     ) throws IOException {

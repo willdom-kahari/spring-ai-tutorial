@@ -1,5 +1,7 @@
 package com.waduclay.springaitutorial.promptstuffing;
 
+import com.waduclay.springaitutorial.dto.ApiResponse;
+import com.waduclay.springaitutorial.exception.AIServiceException;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
@@ -34,7 +36,7 @@ public class OlympicController {
     }
 
     @GetMapping("/2024")
-    public String get2024OlympicSports(
+    public ApiResponse<String> get2024OlympicSports(
             @RequestParam(value = "message", defaultValue = "What sports are being includen in the 2024 summer olympics?") 
             @NotBlank(message = "Message cannot be blank")
             @Size(min = 1, max = 500, message = "Message must be between 1 and 500 characters")
@@ -42,20 +44,25 @@ public class OlympicController {
 
             @RequestParam(value = "stuffit", defaultValue = "false") boolean stuffit
     ) throws IOException {
-        PromptTemplate template = PromptTemplate.builder()
-                .resource(promptTemplate)
-                .variables(Map.of("question", message, "context",""))
-                .build();
+        try {
+            PromptTemplate template = PromptTemplate.builder()
+                    .resource(promptTemplate)
+                    .variables(Map.of("question", message, "context",""))
+                    .build();
 
-        if (stuffit) {
-            template.add("context", olympicSports.getContentAsString(Charset.defaultCharset()) );
+            if (stuffit) {
+                template.add("context", olympicSports.getContentAsString(Charset.defaultCharset()) );
+            }
+            Prompt prompt = template.create();
+            String response = chatClient.prompt(prompt)
+                    .call()
+                    .chatResponse()
+                    .getResult()
+                    .getOutput()
+                    .getText();
+            return ApiResponse.success(response, "Olympic sports information generated successfully");
+        } catch (Exception e) {
+            throw new AIServiceException("Failed to generate Olympic sports information: " + e.getMessage(), e);
         }
-        Prompt prompt = template.create();
-        return chatClient.prompt(prompt)
-                .call()
-                .chatResponse()
-                .getResult()
-                .getOutput()
-                .getText();
     }
 }

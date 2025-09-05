@@ -1,6 +1,9 @@
 package com.waduclay.springaitutorial.rag;
 
 
+import com.waduclay.springaitutorial.dto.ApiResponse;
+import com.waduclay.springaitutorial.exception.AIServiceException;
+import com.waduclay.springaitutorial.exception.VectorStoreException;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
@@ -38,27 +41,36 @@ public class RagController {
 
 
     @GetMapping("/faq")
-    public String generate(@RequestParam(value = "message", defaultValue = "Tell me a Dad joke") 
+    public ApiResponse<String> generate(@RequestParam(value = "message", defaultValue = "Tell me a Dad joke") 
                           @NotBlank(message = "Message cannot be blank")
                           @Size(min = 1, max = 500, message = "Message must be between 1 and 500 characters")
                           String message){
-        List<Document> similarDocs = vectorStore.similaritySearch(
-                SearchRequest.builder()
-                        .query(message)
-                        .topK(DEFAULT_TOP_K)
-                        .build()
-        );
-        List<String> contentList = similarDocs.stream().map(Document::getText).toList();
-        Prompt prompt = PromptTemplate.builder()
-                .resource(ragTemplate)
-                .variables(Map.of("input", message, "documents", String.join("\n", contentList)))
-                .build()
-                .create();
-        return chatClient.prompt(prompt)
-                .call()
-                .chatResponse()
-                .getResult()
-                .getOutput()
-                .getText();
+        try {
+            List<Document> similarDocs = vectorStore.similaritySearch(
+                    SearchRequest.builder()
+                            .query(message)
+                            .topK(DEFAULT_TOP_K)
+                            .build()
+            );
+            List<String> contentList = similarDocs.stream().map(Document::getText).toList();
+            Prompt prompt = PromptTemplate.builder()
+                    .resource(ragTemplate)
+                    .variables(Map.of("input", message, "documents", String.join("\n", contentList)))
+                    .build()
+                    .create();
+            String response = chatClient.prompt(prompt)
+                    .call()
+                    .chatResponse()
+                    .getResult()
+                    .getOutput()
+                    .getText();
+            return ApiResponse.success(response, "RAG response generated successfully");
+        } catch (Exception e) {
+            if (e.getMessage().contains("vector") || e.getMessage().contains("search")) {
+                throw new VectorStoreException("Failed to search vector store: " + e.getMessage(), e);
+            } else {
+                throw new AIServiceException("Failed to generate RAG response: " + e.getMessage(), e);
+            }
+        }
     }
 }

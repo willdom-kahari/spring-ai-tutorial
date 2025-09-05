@@ -1,6 +1,8 @@
 package com.waduclay.springaitutorial.intro;
 
 
+import com.waduclay.springaitutorial.dto.ApiResponse;
+import com.waduclay.springaitutorial.exception.AIServiceException;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,12 +24,17 @@ public class AiController {
     }
 
     @GetMapping("/dad-jokes")
-    public String generate(@RequestParam(value = "message", defaultValue = "Tell me a Dad joke") 
+    public ApiResponse<String> generate(@RequestParam(value = "message", defaultValue = "Tell me a Dad joke") 
                           @NotBlank(message = "Message cannot be blank")
                           @Size(min = 1, max = 500, message = "Message must be between 1 and 500 characters")
                           String message){
-        return chatClient.prompt(message)
-                .call()
-                .content();
+        try {
+            String response = chatClient.prompt(message)
+                    .call()
+                    .content();
+            return ApiResponse.success(response, "AI response generated successfully");
+        } catch (Exception e) {
+            throw new AIServiceException("Failed to generate response: " + e.getMessage(), e);
+        }
     }
 }

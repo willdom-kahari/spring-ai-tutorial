@@ -12,6 +12,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +23,10 @@ import java.util.Map;
  * @author <a href="mailto:developer.wadu@gmail.com">Willdom Kahari</a>
  */
 @RestController
+@Validated
 public class RagController {
+    private static final int DEFAULT_TOP_K = 2;
+    
     @Value("classpath:prompts/rag-prompt-template.st")
     private Resource ragTemplate;
     private final ChatClient chatClient;
@@ -36,7 +42,7 @@ public class RagController {
         List<Document> similarDocs = vectorStore.similaritySearch(
                 SearchRequest.builder()
                         .query(message)
-                        .topK(2)
+                        .topK(DEFAULT_TOP_K)
                         .build()
         );
         List<String> contentList = similarDocs.stream().map(Document::getText).toList();

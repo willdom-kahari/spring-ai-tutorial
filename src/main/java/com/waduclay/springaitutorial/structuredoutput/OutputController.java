@@ -23,18 +23,6 @@ public class OutputController {
     public OutputController(ChatClient.Builder chatClient) {
         this.chatClient = chatClient.build();
     }
-// Without output parser
-//    @GetMapping("/songs")
-//    public String generate(@RequestParam(value = "artist", defaultValue = "Taylor Swift") String artist){
-//        String message = """
-//                Please give me a list of the top 10 songs by {artist}. If you don't know the answer, just say "I don't know".
-//                """;
-//        PromptTemplate template  = new PromptTemplate(message);
-//        Prompt prompt = template.create(Map.of("artist", artist));
-//
-//        ChatResponse chatResponse = chatClient.prompt(prompt).call().chatResponse();
-//        return chatResponse.getResult().getOutput().getText();
-//    }
 
     @GetMapping("/songs")
     //list output converter is used to parse the output

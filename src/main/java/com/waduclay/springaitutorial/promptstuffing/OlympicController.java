@@ -20,6 +20,11 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
+ * REST controller demonstrating prompt stuffing techniques for contextual AI responses.
+ * This controller showcases the technique of "prompt stuffing" - dynamically injecting 
+ * relevant context documents into prompts to improve AI response accuracy and relevance.
+ * It demonstrates conditional context loading based on user preferences.
+ * 
  * @author <a href="mailto:developer.wadu@gmail.com">Willdom Kahari</a>
  */
 @RestController
@@ -31,10 +36,28 @@ public class OlympicController {
     private Resource promptTemplate;
     @Value("classpath:docs/olympic-sports.txt")
     private Resource olympicSports;
+    
+    /**
+     * Constructs a new OlympicController with the provided ChatClient builder.
+     * 
+     * @param chatClient the ChatClient builder used to create the chat client instance
+     */
     public OlympicController(ChatClient.Builder chatClient) {
         this.chatClient = chatClient.build();
     }
 
+    /**
+     * Generates responses about 2024 Olympic sports with optional context stuffing.
+     * This endpoint demonstrates prompt stuffing by conditionally injecting Olympic sports
+     * documentation into the prompt context. When stuffit=true, the AI has access to
+     * detailed Olympic sports information; when false, it relies only on its training data.
+     * 
+     * @param message the question about Olympic sports (1-500 characters, cannot be blank)
+     * @param stuffit whether to inject Olympic sports context document into the prompt
+     * @return ApiResponse containing Olympic sports information with or without context stuffing
+     * @throws AIServiceException if the AI service fails to generate a response
+     * @throws IOException if there's an error reading the Olympic sports document
+     */
     @GetMapping("/2024")
     public ApiResponse<String> get2024OlympicSports(
             @RequestParam(value = "message", defaultValue = "What sports are being includen in the 2024 summer olympics?") 

@@ -18,6 +18,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * REST controller demonstrating structured output conversion techniques with AI responses.
+ * This controller showcases different output parsers and converters to transform unstructured AI text
+ * into structured Java objects including lists, maps, and custom beans. This is essential for
+ * integrating AI responses into applications that require predictable data formats.
+ * 
  * @author <a href="mailto:developer.wadu@gmail.com">Willdom Kahari</a>
  */
 @RestController
@@ -26,12 +31,25 @@ import java.util.Map;
 public class OutputController {
     private final ChatClient chatClient;
 
+    /**
+     * Constructs a new OutputController with the provided ChatClient builder.
+     * 
+     * @param chatClient the ChatClient builder used to create the chat client instance
+     */
     public OutputController(ChatClient.Builder chatClient) {
         this.chatClient = chatClient.build();
     }
 
+    /**
+     * Demonstrates converting AI responses to structured list format.
+     * This endpoint uses ListOutputConverter to parse AI-generated text into a List of strings,
+     * making it easy to work with enumerated data programmatically.
+     * 
+     * @param artist the artist name to generate a song list for (1-100 characters, cannot be blank)
+     * @return ApiResponse containing a list of songs by the specified artist
+     * @throws AIServiceException if the AI service fails to generate or convert the response
+     */
     @GetMapping("/songs")
-    //list output converter is used to parse the output
     public ApiResponse<List<String>> generate(@RequestParam(value = "artist", defaultValue = "Taylor Swift") 
                                 @NotBlank(message = "Artist name cannot be blank")
                                 @Size(min = 1, max = 100, message = "Artist name must be between 1 and 100 characters")
@@ -62,6 +80,15 @@ public class OutputController {
         }
     }
 
+    /**
+     * Demonstrates converting AI responses to structured map format.
+     * This endpoint uses MapOutputConverter to parse AI-generated text into a Map structure,
+     * allowing for key-value pair data representation from unstructured AI responses.
+     * 
+     * @param author the author name to generate social media links for (1-100 characters, cannot be blank)
+     * @return ApiResponse containing a map of author information and social network links
+     * @throws AIServiceException if the AI service fails to generate or convert the response
+     */
     @GetMapping("/{author}")
     public ApiResponse<Map<String, Object>> generateBooks(@PathVariable(value = "author") 
                                            @NotBlank(message = "Author name cannot be blank")
@@ -93,6 +120,15 @@ public class OutputController {
         }
     }
 
+    /**
+     * Demonstrates converting AI responses to structured custom bean format.
+     * This endpoint uses BeanOutputConverter to parse AI-generated text into a custom Java object (Author),
+     * showcasing the most advanced form of structured output conversion for complex data models.
+     * 
+     * @param author the author name to generate book information for (1-100 characters, cannot be blank)
+     * @return ApiResponse containing an Author object with structured book information
+     * @throws AIServiceException if the AI service fails to generate or convert the response
+     */
     @GetMapping("/books")
     public ApiResponse<Author> generateBooksVyAuthor(@RequestParam(value = "author", defaultValue = "Ken Kousen") 
                                        @NotBlank(message = "Author name cannot be blank")

@@ -23,23 +23,51 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * REST controller for Retrieval-Augmented Generation (RAG) operations.
+ * This controller implements RAG functionality by combining vector similarity search
+ * with AI chat completion to provide contextually relevant responses based on stored documents.
+ * It searches for similar documents in the vector store and uses them as context for AI responses.
+ * 
  * @author <a href="mailto:developer.wadu@gmail.com">Willdom Kahari</a>
  */
 @RestController
 @Validated
 public class RagController {
+    /** Default number of top similar documents to retrieve from vector store */
     private static final int DEFAULT_TOP_K = 2;
     
     @Value("classpath:prompts/rag-prompt-template.st")
     private Resource ragTemplate;
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
+    
+    /**
+     * Constructs a new RagController with the provided dependencies.
+     * 
+     * @param chatClient the ChatClient for AI response generation
+     * @param vectorStore the VectorStore for similarity search operations
+     */
     public RagController(ChatClient chatClient, VectorStore vectorStore) {
         this.chatClient = chatClient;
         this.vectorStore = vectorStore;
     }
 
-
+    /**
+     * Generates a contextually-aware AI response using RAG methodology.
+     * This endpoint performs similarity search in the vector store to find relevant documents,
+     * then uses those documents as context to generate an informed AI response.
+     * 
+     * The process involves:
+     * 1. Performing similarity search on the vector store with the input message
+     * 2. Retrieving the top-k most similar documents
+     * 3. Using the retrieved documents as context in a prompt template
+     * 4. Generating an AI response based on the contextualized prompt
+     * 
+     * @param message the input question or message to search for and respond to (1-500 characters, cannot be blank)
+     * @return ApiResponse containing the RAG-generated response with document context
+     * @throws VectorStoreException if the vector store search operation fails
+     * @throws AIServiceException if the AI service fails to generate a response
+     */
     @GetMapping("/faq")
     public ApiResponse<String> generate(@RequestParam(value = "message", defaultValue = "Tell me a Dad joke") 
                           @NotBlank(message = "Message cannot be blank")

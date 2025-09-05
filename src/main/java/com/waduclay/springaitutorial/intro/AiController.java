@@ -12,6 +12,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
+ * REST controller for basic AI chat interactions.
+ * This controller provides endpoints for generating AI responses using OpenAI's ChatGPT.
+ * All responses are wrapped in a standardized ApiResponse format for consistency.
+ * 
  * @author <a href="mailto:developer.wadu@gmail.com">Willdom Kahari</a>
  */
 @RestController
@@ -19,10 +23,24 @@ import jakarta.validation.constraints.Size;
 public class AiController {
     private final ChatClient chatClient;
 
+    /**
+     * Constructs a new AiController with the provided ChatClient builder.
+     * 
+     * @param chatClient the ChatClient builder used to create the chat client instance
+     */
     public AiController(ChatClient.Builder chatClient) {
         this.chatClient = chatClient.build();
     }
 
+    /**
+     * Generates an AI response based on the provided message.
+     * This endpoint accepts a user message and returns an AI-generated response,
+     * typically used for dad jokes or general chat interactions.
+     * 
+     * @param message the input message for the AI to respond to (1-500 characters, cannot be blank)
+     * @return ApiResponse containing the AI-generated response wrapped in a success format
+     * @throws AIServiceException if the AI service fails to generate a response
+     */
     @GetMapping("/dad-jokes")
     public ApiResponse<String> generate(@RequestParam(value = "message", defaultValue = "Tell me a Dad joke") 
                           @NotBlank(message = "Message cannot be blank")

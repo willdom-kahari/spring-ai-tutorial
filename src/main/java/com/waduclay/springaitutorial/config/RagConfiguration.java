@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import jakarta.annotation.PreDestroy;
-import jakarta.annotation.PostConstruct;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -27,7 +26,7 @@ import java.util.List;
 @Configuration
 public class RagConfiguration {
     @Value("classpath:docs/consultancy-faq.txt")
-    private Resource visaFaq;
+    private Resource faqResource ;
     @Value("vectorstore.json")
     private String vectorStoreName;
     private static final Logger log = LoggerFactory.getLogger(RagConfiguration.class);
@@ -37,21 +36,35 @@ public class RagConfiguration {
 
     @Bean
     public SimpleVectorStore simpleVectorStore(OllamaEmbeddingModel embeddingModel) {
+        // Initialize vector store with Ollama embedding model for semantic similarity calculations
         SimpleVectorStore vectorStore = SimpleVectorStore.builder(embeddingModel).build();
         this.vectorStoreFile = getVectorStoreFile();
         
+        // Check if persisted vector store exists to avoid reprocessing documents
         if (vectorStoreFile.exists()){
             log.info("Loading vector store from file: {}", vectorStoreFile);
+            // Load pre-computed embeddings from disk for faster startup
             vectorStore.load(vectorStoreFile);
         } else {
             log.info("Vector store does not exists");
-            TextReader textReader = new TextReader(visaFaq);
+            
+            // Initialize document reader for FAQ text file
+            TextReader textReader = new TextReader(faqResource);
             textReader.getCustomMetadata().put("filename", "consultancy-faq.txt");
             List<Document> documents = textReader.get();
+            
+            // Configure text splitter with default parameters for optimal chunk sizes
+            // Default: 800 tokens per chunk with 400 token overlap for context preservation
             TokenTextSplitter tokenTextSplitter = new TokenTextSplitter();
+            
+            // Split large documents into smaller chunks suitable for embedding and retrieval
+            // This ensures each chunk contains focused, searchable content units
             List<Document> splitDocs = tokenTextSplitter.apply(documents);
+            
+            // Generate embeddings and store in vector database for similarity search
             vectorStore.add(splitDocs);
-            // Ensure parent directory exists before saving
+            
+            // Ensure parent directory exists before saving to prevent file system errors
             File parentDir = vectorStoreFile.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
                 boolean created = parentDir.mkdirs();
@@ -59,10 +72,12 @@ public class RagConfiguration {
                     log.warn("Could not create directory for vector store: {}", parentDir);
                 }
             }
+            
+            // Persist vector store to disk for future application starts
             vectorStore.save(vectorStoreFile);
         }
         
-        // Store reference for cleanup
+        // Store reference for cleanup during application shutdown
         this.vectorStoreInstance = vectorStore;
         return vectorStore;
     }

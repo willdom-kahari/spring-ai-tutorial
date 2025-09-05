@@ -1,4 +1,4 @@
-package com.waduclay.springaitutorial.structuredoutput;
+package com.waduclay.springaitutorial.dto;
 
 
 import java.util.List;

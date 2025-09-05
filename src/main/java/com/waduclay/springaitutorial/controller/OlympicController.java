@@ -1,12 +1,7 @@
-package com.waduclay.springaitutorial.promptstuffing;
+package com.waduclay.springaitutorial.controller;
 
 import com.waduclay.springaitutorial.dto.ApiResponse;
-import com.waduclay.springaitutorial.exception.AIServiceException;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
+import com.waduclay.springaitutorial.service.OlympicService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,8 +11,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Map;
 
 /**
  * REST controller demonstrating prompt stuffing techniques for contextual AI responses.
@@ -31,19 +24,15 @@ import java.util.Map;
 @RequestMapping("/olympics")
 @Validated
 public class OlympicController {
-    private final ChatClient chatClient;
-    @Value("classpath:prompts/olympic-sports.st")
-    private Resource promptTemplate;
-    @Value("classpath:docs/olympic-sports.txt")
-    private Resource olympicSports;
+    private final OlympicService olympicService;
     
     /**
-     * Constructs a new OlympicController with the provided ChatClient builder.
+     * Constructs a new OlympicController with the provided OlympicService.
      * 
-     * @param chatClient the ChatClient builder used to create the chat client instance
+     * @param olympicService the OlympicService used for Olympic sports operations
      */
-    public OlympicController(ChatClient.Builder chatClient) {
-        this.chatClient = chatClient.build();
+    public OlympicController(OlympicService olympicService) {
+        this.olympicService = olympicService;
     }
 
     /**
@@ -55,7 +44,6 @@ public class OlympicController {
      * @param message the question about Olympic sports (1-500 characters, cannot be blank)
      * @param stuffit whether to inject Olympic sports context document into the prompt
      * @return ApiResponse containing Olympic sports information with or without context stuffing
-     * @throws AIServiceException if the AI service fails to generate a response
      * @throws IOException if there's an error reading the Olympic sports document
      */
     @GetMapping("/2024")
@@ -67,25 +55,6 @@ public class OlympicController {
 
             @RequestParam(value = "stuffit", defaultValue = "false") boolean stuffit
     ) throws IOException {
-        try {
-            PromptTemplate template = PromptTemplate.builder()
-                    .resource(promptTemplate)
-                    .variables(Map.of("question", message, "context",""))
-                    .build();
-
-            if (stuffit) {
-                template.add("context", olympicSports.getContentAsString(Charset.defaultCharset()) );
-            }
-            Prompt prompt = template.create();
-            String response = chatClient.prompt(prompt)
-                    .call()
-                    .chatResponse()
-                    .getResult()
-                    .getOutput()
-                    .getText();
-            return ApiResponse.success(response, "Olympic sports information generated successfully");
-        } catch (Exception e) {
-            throw new AIServiceException("Failed to generate Olympic sports information: " + e.getMessage(), e);
-        }
+        return olympicService.get2024OlympicSports(message, stuffit);
     }
 }

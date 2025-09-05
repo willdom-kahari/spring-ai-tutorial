@@ -1,0 +1,41 @@
+Q. What services does your software consultancy provide?
+A. We offer end-to-end software solutions including custom application development, cloud migration, AI/ML integration, DevOps implementation, and legacy system modernization. Our services span discovery workshops, UI/UX design, agile development, quality assurance, and post-launch maintenance.
+
+Q. How do you ensure project timelines are met?
+A. We use agile methodologies with bi-weekly sprints, transparent progress tracking via Jira, and dedicated project managers. Each phase includes buffer time for unexpected complexities, and we provide real-time dashboards for client visibility. Most projects deliver MVP within 3-6 months depending on scope.
+
+Q. What pricing models do you offer?
+A. We provide three flexible options: fixed-price (for well-defined scope), time-and-materials (for evolving requirements), and dedicated team engagement (for long-term partnerships). All include detailed breakdowns with zero hidden fees, and we offer free scoping sessions to determine the optimal model.
+
+Q. How do you handle data security and compliance?
+A. All projects follow ISO 27001 standards with mandatory encryption, regular penetration testing, and GDPR/HIPAA-compliant workflows. We sign NDAs before engagement and implement role-based access controls. Code repositories are secured in private GitHub/GitLab instances with audit trails.
+
+Q. Can you integrate with our existing tech stack?
+A. Yes, our engineers specialize in seamless integration with legacy systems (SAP, Oracle), modern cloud platforms (AWS, Azure), and third-party APIs. We conduct thorough compatibility analysis during discovery and provide integration roadmaps before development begins.
+
+Q. What if our project requirements change mid-development?
+A. We embrace changing requirements through agile practices. New features are prioritized in sprint planning with impact assessments on timeline/budget. We include 20% scope flexibility in all contracts and use change request logs to maintain transparency.
+
+Q. Do you provide post-launch support?
+A. Yes, we offer tiered support packages: 30 days of free bug fixing post-launch, then optional SLA-backed maintenance (99.9% uptime guarantee), feature enhancements, and 24/7 emergency response. Most clients opt for our annual "Evolution Plan" covering updates and scaling.
+
+Q. How do you select the right technology stack for a project?
+A. We conduct technical feasibility studies considering scalability needs, team expertise, and long-term maintenance. For startups, we recommend cost-effective stacks like React/Node.js; for enterprise systems, we prioritize .NET or Java with Kubernetes orchestration.
+
+Q. What is your approach to quality assurance?
+A. We implement automated testing (Selenium, Jest) covering 80%+ of code, manual exploratory testing, and performance/load testing. All projects undergo 3-stage QA: developer unit tests, dedicated QA team validation, and UAT with client stakeholders before release.
+
+Q. How involved do clients need to be during development?
+A. We require weekly sprint reviews and backlog refinement sessions, but minimize daily disruption. Clients nominate a single point of contact for decisions, while our PM handles day-to-day coordination. We provide video demos every 10 days for progress validation.
+
+Q. Can you work with our in-house development team?
+A. Absolutely. We specialize in augmentation models using collaborative tools like Slack and Confluence. We adapt to your team's workflows, provide knowledge transfer sessions, and use pair programming for seamless integration without disrupting your existing processes.
+
+Q. What industries do you specialize in?
+A. We have deep expertise in fintech (including PCI-DSS compliant systems), healthtech (HIPAA), e-commerce, and SaaS platforms. 60% of our projects serve regulated industries, with domain-specific knowledge in payment processing, telehealth, and supply chain solutions.
+
+Q. How do you handle intellectual property rights?
+A. All code and documentation created for you become your exclusive property upon final payment. We provide full source code ownership with written assignment in contracts, while retaining the right to use anonymized case studies for portfolio purposes.
+
+Q. What makes your consultancy different from offshore vendors?
+A. We combine nearshore cost efficiency (with teams in Poland and Canada) with US/EU timezone alignment. Unlike generic vendors, we embed domain experts in your industry and maintain 30% staff turnover rate (vs. industry 45%) through career development programs.

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import jakarta.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -29,11 +31,15 @@ public class RagConfiguration {
     @Value("vectorstore.json")
     private String vectorStoreName;
     private static final Logger log = LoggerFactory.getLogger(RagConfiguration.class);
+    
+    private SimpleVectorStore vectorStoreInstance;
+    private File vectorStoreFile;
 
     @Bean
     public SimpleVectorStore simpleVectorStore(OllamaEmbeddingModel embeddingModel) {
         SimpleVectorStore vectorStore = SimpleVectorStore.builder(embeddingModel).build();
-        File vectorStoreFile = getVectorStoreFile();
+        this.vectorStoreFile = getVectorStoreFile();
+        
         if (vectorStoreFile.exists()){
             log.info("Loading vector store from file: {}", vectorStoreFile);
             vectorStore.load(vectorStoreFile);
@@ -55,7 +61,28 @@ public class RagConfiguration {
             }
             vectorStore.save(vectorStoreFile);
         }
+        
+        // Store reference for cleanup
+        this.vectorStoreInstance = vectorStore;
         return vectorStore;
+    }
+    
+    /**
+     * Ensures proper cleanup of vector store resources on application shutdown.
+     * This method saves the current state of the vector store to disk before
+     * the application terminates, preventing data loss.
+     */
+    @PreDestroy
+    public void cleanupVectorStore() {
+        if (vectorStoreInstance != null && vectorStoreFile != null) {
+            try {
+                log.info("Saving vector store on shutdown: {}", vectorStoreFile);
+                vectorStoreInstance.save(vectorStoreFile);
+                log.info("Vector store successfully saved on shutdown");
+            } catch (Exception e) {
+                log.error("Failed to save vector store on shutdown: {}", e.getMessage(), e);
+            }
+        }
     }
 
     private File getVectorStoreFile(){

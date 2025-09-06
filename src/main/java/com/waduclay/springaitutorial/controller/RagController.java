@@ -4,11 +4,16 @@ package com.waduclay.springaitutorial.controller;
 import com.waduclay.springaitutorial.dto.ApiResponse;
 import com.waduclay.springaitutorial.service.RagService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller for Retrieval-Augmented Generation (RAG) operations.
@@ -19,7 +24,9 @@ import jakarta.validation.constraints.Size;
  * @author <a href="mailto:developer.wadu@gmail.com">Willdom Kahari</a>
  */
 @RestController
+@RequestMapping("/api/v1/rag")
 @Validated
+@Tag(name = "RAG Operations", description = "Retrieval-Augmented Generation endpoints for contextual AI responses")
 public class RagController {
     private final RagService ragService;
     
@@ -46,8 +53,28 @@ public class RagController {
      * @param message the input question or message to search for and respond to (1-500 characters, cannot be blank)
      * @return ApiResponse containing the RAG-generated response with document context
      */
+    @Operation(
+        summary = "Generate RAG Response",
+        description = "Generates a contextually-aware AI response using Retrieval-Augmented Generation (RAG) methodology based on stored documents."
+    )
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "200", 
+            description = "Successfully generated RAG response"
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "400", 
+            description = "Invalid input parameters"
+        ),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "503", 
+            description = "RAG service unavailable"
+        )
+    })
     @GetMapping("/faq")
-    public ApiResponse<String> generate(@RequestParam(value = "message", defaultValue = "Tell me a Dad joke") 
+    public ApiResponse<String> generate(
+            @Parameter(description = "Input question or message for RAG processing", example = "What services do you offer?")
+            @RequestParam(value = "message", defaultValue = "What services do you offer?")
                           @NotBlank(message = "Message cannot be blank")
                           @Size(min = 1, max = 500, message = "Message must be between 1 and 500 characters")
                           String message){

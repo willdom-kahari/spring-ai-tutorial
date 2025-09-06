@@ -3,12 +3,17 @@ package com.waduclay.springaitutorial.controller;
 
 import com.waduclay.springaitutorial.dto.ApiResponse;
 import com.waduclay.springaitutorial.service.ChatService;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.validation.annotation.Validated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.io.IOException;
 
 /**
  * REST controller demonstrating various prompt engineering techniques with AI chat.
@@ -19,7 +24,9 @@ import jakarta.validation.constraints.Size;
  * @author <a href="mailto:developer.wadu@gmail.com">Willdom Kahari</a>
  */
 @RestController
+@RequestMapping("/api/v1/prompts")
 @Validated
+@Tag(name = "Prompt Engineering", description = "Demonstrations of various prompt engineering techniques and templates")
 public class SimplePromptController {
     private final ChatService chatService;
 
@@ -85,5 +92,19 @@ public class SimplePromptController {
     @GetMapping("/jokes")
     public ApiResponse<String> dadJoke() {
         return chatService.generateWithSystemMessage();
+    }
+
+    @GetMapping("/stuffing")
+    public ApiResponse<String> get2024OlympicSports(
+            @Parameter(description = "Question about 2024 Olympic sports", example = "What sports are being included in the 2024 summer olympics?")
+            @RequestParam(value = "message", defaultValue = "What sports are being includen in the 2024 summer olympics?")
+            @NotBlank(message = "Message cannot be blank")
+            @Size(min = 1, max = 500, message = "Message must be between 1 and 500 characters")
+            String message,
+
+            @Parameter(description = "Whether to inject Olympic sports context into the prompt", example = "false")
+            @RequestParam(value = "stuffit", defaultValue = "false") boolean stuffit
+    ) {
+        return chatService.stuffThePrompt(message, stuffit);
     }
 }

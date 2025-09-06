@@ -1,6 +1,8 @@
 package com.waduclay.springaitutorial.service;
 
 import com.waduclay.springaitutorial.dto.ApiResponse;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 /**
  * Service interface for AI chat operations.
@@ -56,4 +58,6 @@ public interface ChatService {
      * @return ApiResponse containing AI response with system message constraints
      */
     ApiResponse<String> generateWithSystemMessage();
+
+    ApiResponse<String> stuffThePrompt(@NotBlank(message = "Message cannot be blank") @Size(min = 1, max = 500, message = "Message must be between 1 and 500 characters") String message, boolean stuffit);
 }

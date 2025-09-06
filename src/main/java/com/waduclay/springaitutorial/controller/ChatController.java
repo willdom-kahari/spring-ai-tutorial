@@ -4,6 +4,7 @@ package com.waduclay.springaitutorial.controller;
 import com.waduclay.springaitutorial.dto.ApiResponse;
 import com.waduclay.springaitutorial.service.ChatService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.validation.annotation.Validated;
@@ -23,9 +24,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author <a href="mailto:developer.wadu@gmail.com">Willdom Kahari</a>
  */
 @RestController
+@RequestMapping("/api/v1/chat")
 @Validated
 @Tag(name = "AI Chat", description = "Basic AI chat interactions and response generation")
-public class AiController {
+public class ChatController {
     private final ChatService chatService;
 
     /**
@@ -33,7 +35,7 @@ public class AiController {
      * 
      * @param chatService the ChatService used for AI chat operations
      */
-    public AiController(ChatService chatService) {
+    public ChatController(ChatService chatService) {
         this.chatService = chatService;
     }
 
@@ -63,7 +65,7 @@ public class AiController {
             description = "AI service unavailable"
         )
     })
-    @GetMapping("/dad-jokes")
+    @GetMapping("/basic")
     public ApiResponse<String> generate(
             @Parameter(description = "Input message for AI to respond to", example = "Tell me a Dad joke")
             @RequestParam(value = "message", defaultValue = "Tell me a Dad joke") 

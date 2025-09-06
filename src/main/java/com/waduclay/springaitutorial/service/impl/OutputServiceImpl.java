@@ -38,6 +38,16 @@ public class OutputServiceImpl implements OutputService {
         this.chatClient = chatClient.build();
     }
     
+    /**
+     * Generates a list of top 10 songs for the specified artist using AI and structured output conversion.
+     * This method uses ListOutputConverter to parse AI-generated text into a structured List format.
+     * The AI is prompted to provide song information and responds with "I don't know" if uncertain.
+     * 
+     * @param artist the artist name to generate songs list for (must not be null or empty)
+     * @return ApiResponse containing a List of song names wrapped in success format
+     * @throws IllegalArgumentException if artist is null or empty (handled by controller validation)
+     * @throws AIServiceException if AI service fails or output parsing encounters errors
+     */
     @Override
     public ApiResponse<List<String>> generateSongsList(String artist) {
         try {
@@ -66,6 +76,16 @@ public class OutputServiceImpl implements OutputService {
         }
     }
     
+    /**
+     * Generates author information and social media links using AI and structured output conversion.
+     * This method uses MapOutputConverter to parse AI-generated text into a structured Map format
+     * containing author details and their associated social network links.
+     * 
+     * @param author the author name to generate links for (must not be null or empty, 1-100 characters)
+     * @return ApiResponse containing a Map with author information and social links wrapped in success format
+     * @throws IllegalArgumentException if author is null or empty (handled by controller validation)
+     * @throws AIServiceException if AI service fails or output parsing encounters errors
+     */
     @Override
     public ApiResponse<Map<String, Object>> generateAuthorLinks(String author) {
         try {
@@ -94,6 +114,17 @@ public class OutputServiceImpl implements OutputService {
         }
     }
     
+    /**
+     * Generates structured author book information using AI and custom bean output conversion.
+     * This method uses BeanOutputConverter to parse AI-generated text into a custom Author object,
+     * demonstrating the most advanced form of structured output conversion for complex data models.
+     * The AI only includes books it's confident belong to the specified author.
+     * 
+     * @param author the author name to generate book information for (must not be null or empty, 1-100 characters)
+     * @return ApiResponse containing an Author object with structured book information wrapped in success format
+     * @throws IllegalArgumentException if author is null or empty (handled by controller validation)
+     * @throws AIServiceException if AI service fails or bean conversion encounters errors
+     */
     @Override
     public ApiResponse<Author> generateAuthorBooks(String author) {
         try {

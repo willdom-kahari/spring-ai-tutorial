@@ -104,6 +104,36 @@ public class GlobalExceptionHandler {
     }
     
     /**
+     * Handles SecurityException from input sanitization and content filtering.
+     * Maps security validation failures to HTTP 400 (Bad Request) status.
+     * Returns masked error message to prevent information disclosure while logging full details.
+     * 
+     * @param ex the SecurityException that was thrown
+     * @return ResponseEntity with masked security error and HTTP 400 status
+     */
+    @ExceptionHandler(SecurityException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<String> handleSecurityException(SecurityException ex) {
+        log.warn("Security validation failed: {}", ex.getMessage());
+        // Return generic message to prevent information disclosure about security measures
+        return new ApiResponse<>(false, "Request Validation Error", "Request contains invalid or inappropriate content");
+    }
+    
+    /**
+     * Handles IllegalArgumentException from basic input validation.
+     * Maps argument validation failures to HTTP 400 (Bad Request) status.
+     * 
+     * @param ex the IllegalArgumentException that was thrown
+     * @return ResponseEntity with validation error details and HTTP 400 status
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.warn("Input validation error: {}", ex.getMessage());
+        return new ApiResponse<>(false, "Input Validation Error", ex.getMessage());
+    }
+    
+    /**
      * Handles all other uncaught exceptions as a fallback.
      * Maps any unhandled exception to HTTP 500 (Internal Server Error) with a generic message
      * to avoid exposing sensitive system information.

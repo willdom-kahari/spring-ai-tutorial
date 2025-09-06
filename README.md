@@ -112,9 +112,6 @@ Once the application is running, you can access:
 ├── README.md                           # This file
 ├── docs/                              # Comprehensive documentation
 │   ├── API_USAGE_GUIDE.md            # Detailed API usage examples
-│   ├── DEPLOYMENT_GUIDE.md           # Deployment instructions
-│   ├── DEVELOPER_GUIDE.md            # Development guidelines
-│   └── TROUBLESHOOTING_GUIDE.md      # Common issues and solutions
 ├── src/
 │   ├── main/
 │   │   ├── java/com/waduclay/springaitutorial/

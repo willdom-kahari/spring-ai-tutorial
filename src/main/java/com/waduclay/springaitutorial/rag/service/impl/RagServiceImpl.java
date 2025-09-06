@@ -1,10 +1,10 @@
 package com.waduclay.springaitutorial.rag.service.impl;
 
+import com.waduclay.springaitutorial.rag.repository.VectorStoreRepository;
+import com.waduclay.springaitutorial.rag.service.RagService;
 import com.waduclay.springaitutorial.shared.dto.ApiResponse;
 import com.waduclay.springaitutorial.shared.exception.AIServiceException;
 import com.waduclay.springaitutorial.shared.exception.VectorStoreException;
-import com.waduclay.springaitutorial.rag.repository.VectorStoreRepository;
-import com.waduclay.springaitutorial.rag.service.RagService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
@@ -52,18 +52,18 @@ public class RagServiceImpl implements RagService {
     }
 
     @Override
-    public ApiResponse<String> generateRagResponse(String message) {
+    public ApiResponse<String> generateRagResponse(String query) {
         try {
             List<Document> similarDocs = vectorStoreRepository.findSimilarDocuments(
                     SearchRequest.builder()
-                            .query(message)
+                            .query(query)
                             .topK(DEFAULT_TOP_K)
                             .build()
             );
             List<String> contentList = similarDocs.stream().map(Document::getText).toList();
             Prompt prompt = PromptTemplate.builder()
                     .resource(ragTemplate)
-                    .variables(Map.of("input", message, "documents", String.join("\n", contentList)))
+                    .variables(Map.of("input", query, "documents", String.join("\n", contentList)))
                     .build()
                     .create();
             String response = chatClient.prompt(prompt)
@@ -79,6 +79,31 @@ public class RagServiceImpl implements RagService {
             } else {
                 throw new AIServiceException("Failed to generate RAG response: " + e.getMessage(), e);
             }
+        }
+    }
+
+    @Override
+    public ApiResponse<List<Map<String, Object>>> searchDocuments(String query, Integer topK) {
+        try {
+            int searchTopK = topK != null ? topK : 5;
+            List<Document> similarDocs = vectorStoreRepository.findSimilarDocuments(
+                    SearchRequest.builder()
+                            .query(query)
+                            .topK(searchTopK)
+                            .build()
+            );
+
+            List<Map<String, Object>> results = similarDocs.stream()
+                    .map(doc -> Map.of(
+                            "content", doc.getText(),
+                            "metadata", doc.getMetadata(),
+                            "score", doc.getMetadata().getOrDefault("distance", 0.0)
+                    ))
+                    .toList();
+
+            return ApiResponse.success(results, "Document search completed successfully");
+        } catch (Exception e) {
+            throw new VectorStoreException("Failed to search documents: " + e.getMessage(), e);
         }
     }
 
